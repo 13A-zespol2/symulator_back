@@ -3,6 +3,7 @@ package psk.isi.simulator.rest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import psk.isi.simulator.model.database.entities.PhoneNumber;
@@ -19,13 +20,13 @@ public class LoginPhoneController {
     private final PhoneNumberRepository phoneNumberRepository;
 
     @PostMapping(path = "/login")
-    public ResponseEntity<PhoneNumberDto> loginPhoneNumber(HttpServletRequest request) {
+    public ResponseEntity<PhoneNumberDto> loginPhoneNumber(@RequestBody PhoneNumberDto phoneNumber) {
 
-        String pin = request.getParameter("pin");
-        String phoneNumber = request.getParameter("phoneNumber");
-        Optional<PhoneNumber> byNumber = phoneNumberRepository.findByNumber(phoneNumber);
+        String pin = phoneNumber.getPin();
+        String number = phoneNumber.getNumber();
+        Optional<PhoneNumber> byNumber = phoneNumberRepository.findByNumber(number);
 
-        if (byNumber.isEmpty()) {
+        if (!byNumber.isEmpty()) {
             PhoneNumber phoneNumber1 = byNumber.get();
             if (phoneNumber1.getPin().equals(pin)) {
                 return ResponseEntity.ok(PhoneNumberConverter.toDto(phoneNumber1));
@@ -33,6 +34,7 @@ public class LoginPhoneController {
         }
         return ResponseEntity.notFound().build();
     }
+
 
 
 
