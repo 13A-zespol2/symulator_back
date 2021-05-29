@@ -26,7 +26,7 @@ public class LoginPhoneController {
         String number = phoneNumber.getNumber();
         Optional<PhoneNumber> byNumber = phoneNumberRepository.findByNumber(number);
 
-        if (!byNumber.isEmpty()) {
+        if (byNumber.isPresent()) {
             PhoneNumber phoneNumber1 = byNumber.get();
             if (phoneNumber1.getPin().equals(pin)) {
                 return ResponseEntity.ok(PhoneNumberConverter.toDto(phoneNumber1));

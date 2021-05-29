@@ -9,7 +9,11 @@ public class PhoneNumberConverter {
         return new PhoneNumberDto(phoneNumber.getNumber(), phoneNumber.getPin());
     }
 
-    public static PhoneNumber updateEntity(Long id, PhoneNumber phoneNumber) {
-        return new PhoneNumber(id, phoneNumber.getNumber(), phoneNumber.getPin());
+    public static PhoneNumber updateEntity( PhoneNumber phoneNumber) {
+        return new PhoneNumber(phoneNumber.getNumber(), phoneNumber.getPin());
+    }
+
+    public static PhoneNumber toEntity( PhoneNumberDto phoneNumber) {
+        return new PhoneNumber(phoneNumber.getNumber(), phoneNumber.getPin());
     }
 }

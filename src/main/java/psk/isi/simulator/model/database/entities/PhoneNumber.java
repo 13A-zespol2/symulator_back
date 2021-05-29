@@ -19,4 +19,10 @@ public class PhoneNumber {
     private Long idPhoneNumber;
     private String number;
     private String pin;
+
+
+    public PhoneNumber(String number, String pin) {
+        this.number = number;
+        this.pin = pin;
+    }
 }
