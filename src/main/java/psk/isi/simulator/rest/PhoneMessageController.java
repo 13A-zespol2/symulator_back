@@ -13,9 +13,7 @@ import psk.isi.simulator.model.transport.converter.SmsHistoryConverter;
 import psk.isi.simulator.model.transport.dto.SmsHistoryDTO;
 import psk.isi.simulator.service.SendMessageService;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -57,7 +55,7 @@ public class PhoneMessageController {
 
         List<SmsHistoryDTO> sorted = collect.stream().map(SmsHistoryConverter::toDto).sorted(Comparator.comparing(SmsHistoryDTO::getDateSms).reversed()).collect(Collectors.toList());
 
-
+        Set<SmsHistoryDTO> s = new HashSet<>(sorted);
         return ResponseEntity.ok(sorted);
     }
 }
