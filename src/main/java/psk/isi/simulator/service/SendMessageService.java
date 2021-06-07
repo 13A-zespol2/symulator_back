@@ -28,7 +28,6 @@ public class SendMessageService {
         return phoneNumberRepository.findByNumber(phoneNumberString);
     }
 
-
     public SmsHistory saveMessage(SmsHistoryDTO smsToSend) throws NoSuchPhoneNumber {
         PhoneNumber phoneNumber = findPhoneNumberReceiver(smsToSend.getPhoneNumberReceiver()).
                 orElseThrow(() -> new NoSuchPhoneNumber("No such phone number " + smsToSend.getPhoneNumberReceiver()));
@@ -39,6 +38,6 @@ public class SendMessageService {
         smsHistory.setPhoneNumberSender(phoneNumberSender.get());
 
         return smsHistoryRepository.save(smsHistory);
-    }
 
+    }
 }
