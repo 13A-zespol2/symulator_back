@@ -13,8 +13,9 @@ import psk.isi.simulator.model.transport.converter.SmsHistoryConverter;
 import psk.isi.simulator.model.transport.dto.SmsHistoryDTO;
 import psk.isi.simulator.service.SendMessageService;
 
-import java.util.*;
-import java.util.Date;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -50,11 +51,13 @@ public class PhoneMessageController {
     }
 
     @GetMapping(path = "/{phoneNumber}")
-    public ResponseEntity<List<String>> getAllNumber(@PathVariable String phoneNumber){
+    public ResponseEntity<List<SmsHistoryDTO>> getAllNumber(@PathVariable String phoneNumber) {
         Optional<PhoneNumber> byNumber = phoneNumberRepository.findByNumber(phoneNumber);
+        List<SmsHistory> collect = smsHistoryRepository.findAllByPhoneNumberSender(byNumber.get());
 
-        List<String> collect = smsHistoryRepository.findAllByPhoneNumberSender(byNumber.get()).stream().map(e -> e.getPhoneNumberReceiver().getNumber()).distinct().collect(Collectors.toList());
+        List<SmsHistoryDTO> sorted = collect.stream().map(SmsHistoryConverter::toDto).sorted(Comparator.comparing(SmsHistoryDTO::getDateSms).reversed()).collect(Collectors.toList());
 
-        return ResponseEntity.ok(collect);
+
+        return ResponseEntity.ok(sorted);
     }
 }
