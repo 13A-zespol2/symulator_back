@@ -13,7 +13,13 @@ import psk.isi.simulator.model.transport.converter.SmsHistoryConverter;
 import psk.isi.simulator.model.transport.dto.SmsHistoryDTO;
 import psk.isi.simulator.service.SendMessageService;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @RestController
@@ -53,9 +59,12 @@ public class PhoneMessageController {
         Optional<PhoneNumber> byNumber = phoneNumberRepository.findByNumber(phoneNumber);
         List<SmsHistory> collect = smsHistoryRepository.findAllByPhoneNumberSender(byNumber.get());
 
-        List<SmsHistoryDTO> sorted = collect.stream().map(SmsHistoryConverter::toDto).sorted(Comparator.comparing(SmsHistoryDTO::getDateSms).reversed()).collect(Collectors.toList());
+        List<SmsHistoryDTO> collect1 = collect.stream().sorted(Comparator.comparing(SmsHistory::getDateSms).reversed()).filter(distinctByKey(SmsHistory::getPhoneNumberReceiver)).map(SmsHistoryConverter::toDto).collect(Collectors.toList());
+        return ResponseEntity.ok(collect1);
+    }
 
-        Set<SmsHistoryDTO> s = new HashSet<>(sorted);
-        return ResponseEntity.ok(sorted);
+    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
     }
 }
