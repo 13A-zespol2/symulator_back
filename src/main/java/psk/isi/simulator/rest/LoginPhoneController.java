@@ -14,7 +14,6 @@ import psk.isi.simulator.model.transport.dto.PhoneNumberDto;
 import java.util.Optional;
 
 @RestController
-
 public class LoginPhoneController {
     private final PhoneNumberRepository phoneNumberRepository;
     private PasswordEncoder passwordEncoder;
@@ -27,16 +26,14 @@ public class LoginPhoneController {
 
     @PostMapping(path = "/login")
     public ResponseEntity<PhoneNumberDto> loginPhoneNumber(@RequestBody PhoneNumberDto phoneNumber) {
-
-        String pin = phoneNumber.getPin();
         String number = phoneNumber.getNumber();
         Optional<PhoneNumber> byNumber = phoneNumberRepository.findByNumber(number);
 
         if (byNumber.isPresent()) {
             PhoneNumber phoneNumberDatabase = byNumber.get();
-            if (passwordEncoder.matches(phoneNumberDatabase.getPin(),phoneNumber.getPin())) {
-                return ResponseEntity.ok(PhoneNumberConverter.toDto(phoneNumberDatabase));
-            }
+            boolean matches = passwordEncoder.matches(phoneNumberDatabase.getPin(), phoneNumber.getPin());
+
+            return matches ? ResponseEntity.ok(PhoneNumberConverter.toDto(phoneNumberDatabase)) : ResponseEntity.badRequest().build();
         }
         return ResponseEntity.notFound().build();
     }
