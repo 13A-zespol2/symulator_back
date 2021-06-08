@@ -31,7 +31,7 @@ public class LoginPhoneController {
 
         if (byNumber.isPresent()) {
             PhoneNumber phoneNumberDatabase = byNumber.get();
-            boolean matches = passwordEncoder.matches(phoneNumberDatabase.getPin(), phoneNumber.getPin());
+            boolean matches = passwordEncoder.matches(phoneNumber.getPin(),phoneNumberDatabase.getPin());
 
             return matches ? ResponseEntity.ok(PhoneNumberConverter.toDto(phoneNumberDatabase)) : ResponseEntity.badRequest().build();
         }
