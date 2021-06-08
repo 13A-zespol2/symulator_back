@@ -59,7 +59,10 @@ public class PhoneMessageController {
         Optional<PhoneNumber> byNumber = phoneNumberRepository.findByNumber(phoneNumber);
         List<SmsHistory> collect = smsHistoryRepository.findAllByPhoneNumberSender(byNumber.get());
 
-        List<SmsHistoryDTO> collect1 = collect.stream().sorted(Comparator.comparing(SmsHistory::getDateSms).reversed()).filter(distinctByKey(SmsHistory::getPhoneNumberReceiver)).map(SmsHistoryConverter::toDto).collect(Collectors.toList());
+        List<SmsHistoryDTO> collect1 = collect.stream()
+                .sorted(Comparator.comparing(SmsHistory::getDateSms).reversed())
+                .filter(distinctByKey(SmsHistory::getPhoneNumberReceiver))
+                .map(SmsHistoryConverter::toDto).collect(Collectors.toList());
         return ResponseEntity.ok(collect1);
     }
 
