@@ -4,4 +4,5 @@ import psk.isi.simulator.model.database.entities.NumberBalance;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface NumberBalanceRepository extends JpaRepository<NumberBalance, Long> {
+    NumberBalance findByPhoneNumber(String phoneNumber);
 }
