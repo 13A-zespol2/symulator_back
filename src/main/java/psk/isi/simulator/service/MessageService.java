@@ -18,7 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class MessageService {
@@ -69,34 +68,32 @@ public class MessageService {
 
     public List<SmsHistoryDTO> findLastSms(String phoneNumber) throws NoSuchPhoneNumber {
         PhoneNumber byNumber = phoneNumberRepository.findByNumber(phoneNumber).orElseThrow(() -> new NoSuchPhoneNumber("No such phone number " + phoneNumber));
-        List<SmsHistory> collect = smsHistoryRepository.findAllByPhoneNumberSender(byNumber);
+        List<SmsHistory> collect = smsHistoryRepository.findAllByNumberQuery(byNumber);
 
-        return collect.stream()
+        List<SmsHistory> collect1 = collect.stream()
                 .sorted(Comparator.comparing(SmsHistory::getDateSms).reversed())
                 .filter(distinctByKey(SmsHistory::getPhoneNumberReceiver))
-                .map(SmsHistoryConverter::toDto).collect(Collectors.toList());
+                .filter(distinctByKey(SmsHistory::getPhoneNumberSender))
+                .collect(Collectors.toList());
+
+        List<SmsHistoryDTO> smsHistoryDTOS = new ArrayList<>();
+        for (SmsHistory el : collect1) {
+            if (!el.getPhoneNumberSender().equals(byNumber)) {
+                PhoneNumber phoneNumberReceiver = el.getPhoneNumberReceiver();
+                el.setPhoneNumberReceiver(el.getPhoneNumberSender());
+                el.setPhoneNumberSender(phoneNumberReceiver);
+            }
+            smsHistoryDTOS.add(SmsHistoryConverter.toDto(el));
+        }
+        return smsHistoryDTOS;
     }
 
     public List<SmsHistoryDTO> smsHistoryDTOList(String phoneNumberSenderString, String phoneNumberReceiverString) {
 
         Optional<PhoneNumber> optionalPhoneNumberSender = phoneNumberRepository.findByNumber(phoneNumberSenderString);
-        Optional<PhoneNumber> optionalPhoneNumberReceiver = phoneNumberRepository.findByNumber(phoneNumberReceiverString);
-
-        if (optionalPhoneNumberSender.isPresent() && optionalPhoneNumberReceiver.isPresent()) {
+        if (optionalPhoneNumberSender.isPresent()) {
             PhoneNumber phoneNumberSender = optionalPhoneNumberSender.get();
-            PhoneNumber phoneNumberReceiver = optionalPhoneNumberReceiver.get();
-
-
-            List<SmsHistoryDTO> sender = smsHistoryRepository.findByPhoneNumberReceiverAndPhoneNumberSender(phoneNumberSender, phoneNumberReceiver).stream()
-                    .map(SmsHistoryConverter::toDto)
-                    .collect(Collectors.toList());
-
-            List<SmsHistoryDTO> receiver = smsHistoryRepository.findByPhoneNumberReceiverAndPhoneNumberSender(phoneNumberReceiver, phoneNumberSender).stream()
-                    .map(SmsHistoryConverter::toDto)
-                    .collect(Collectors.toList());
-
-
-            return Stream.concat(receiver.stream(), sender.stream()).collect(Collectors.toList());
+            return smsHistoryRepository.findAllByNumberQuery(phoneNumberSender).stream().map(SmsHistoryConverter::toDto).collect(Collectors.toList());
         }
 
         return null;

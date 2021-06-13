@@ -60,7 +60,7 @@ public class MessagePhoneController {
     }
 
     @PostMapping(path = "/load")
-    public ResponseEntity<List<SmsHistoryDTO>> getAllNumber(@RequestBody DtoLoad receiver) {
+    public ResponseEntity<List<SmsHistoryDTO>> getAllNumbers(@RequestBody DtoLoad receiver) {
 
             List<SmsHistoryDTO> lastSms = messageService.smsHistoryDTOList(receiver.getPhoneNumberSender().getNumber(),receiver.getPhoneNumberReceiver());
             return ResponseEntity.ok(lastSms);
