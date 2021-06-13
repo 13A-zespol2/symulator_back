@@ -40,9 +40,7 @@ public class MessagePhoneController {
         try {
             smsHistory1 = messageService.saveMessage(smsHistoryDTO);
             messageService.smsHistoryDTOList(smsHistoryDTO.getPhoneNumberSender().getNumber(),smsHistoryDTO.getPhoneNumberSender().getNumber());
-
             return ResponseEntity.ok(SmsHistoryConverter.toDto(smsHistory1));
-
         } catch (NoSuchPhoneNumber | NoSmsBalance noSuchPhoneNumber) {
             return ResponseEntity.badRequest().build();
         }
@@ -51,7 +49,6 @@ public class MessagePhoneController {
     @GetMapping(path = "/{phoneNumber}")
     public ResponseEntity<List<SmsHistoryDTO>> getLastNumber(@PathVariable String phoneNumber) {
         try {
-
             List<SmsHistoryDTO> lastSms = messageService.findLastSms(phoneNumber);
             return ResponseEntity.ok(lastSms);
         } catch (NoSuchPhoneNumber noSuchPhoneNumber) {

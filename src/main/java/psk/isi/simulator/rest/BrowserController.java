@@ -23,7 +23,10 @@ public class BrowserController {
     public BrowserController(BrowserService browserService) {
         this.browserService = browserService;
     }
-
+    @GetMapping
+    public ResponseEntity<Double> getInternetBalance(String phoneNumber) {
+        return ResponseEntity.ok(browserService.takeInternet(phoneNumber));
+    }
 
     @PostMapping(path = "/time")
     public ResponseEntity<?> getTimeOnBrowser(@RequestBody BrowserDto browserDto){

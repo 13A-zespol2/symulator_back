@@ -43,4 +43,13 @@ public class BrowserService {
         byPhoneNumber.setBalanceInternet(balanceInternet - timeSpent);
         numberBalanceRepository.save(byPhoneNumber);
     }
+
+    public double takeInternet(String phoneNumber) {
+        Optional<PhoneNumber> byNumber = phoneNumberRepository.findByNumber(phoneNumber);
+        if (byNumber.isEmpty()) {
+            return 0;
+        }
+        PhoneNumber phoneNumber1 = byNumber.get();
+        return numberBalanceRepository.findByPhoneNumber(phoneNumber1).getBalanceInternet();
+    }
 }
