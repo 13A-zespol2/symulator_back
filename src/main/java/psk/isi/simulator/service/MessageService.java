@@ -2,9 +2,12 @@ package psk.isi.simulator.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import psk.isi.simulator.errors.NoSmsBalance;
 import psk.isi.simulator.errors.NoSuchPhoneNumber;
+import psk.isi.simulator.model.database.entities.NumberBalance;
 import psk.isi.simulator.model.database.entities.PhoneNumber;
 import psk.isi.simulator.model.database.entities.SmsHistory;
+import psk.isi.simulator.model.database.repository.NumberBalanceRepository;
 import psk.isi.simulator.model.database.repository.PhoneNumberRepository;
 import psk.isi.simulator.model.database.repository.SmsHistoryRepository;
 import psk.isi.simulator.model.transport.converter.SmsHistoryConverter;
@@ -15,16 +18,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class MessageService {
     private final SmsHistoryRepository smsHistoryRepository;
     private final PhoneNumberRepository phoneNumberRepository;
+    private final NumberBalanceRepository numberBalanceRepository;
 
     @Autowired
-    public MessageService(SmsHistoryRepository smsHistoryRepository, PhoneNumberRepository phoneNumberRepository) {
+    public MessageService(SmsHistoryRepository smsHistoryRepository, PhoneNumberRepository phoneNumberRepository, NumberBalanceRepository numberBalanceRepository) {
         this.smsHistoryRepository = smsHistoryRepository;
         this.phoneNumberRepository = phoneNumberRepository;
+        this.numberBalanceRepository = numberBalanceRepository;
     }
 
     private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
@@ -36,7 +42,17 @@ public class MessageService {
         return phoneNumberRepository.findByNumber(phoneNumberString);
     }
 
-    public SmsHistory saveMessage(SmsHistoryDTO smsToSend) throws NoSuchPhoneNumber {
+    private void subSmsFromBalance(PhoneNumber phoneNumber) throws NoSmsBalance {
+        NumberBalance byPhoneNumber = numberBalanceRepository.findByPhoneNumber(phoneNumber);
+        int smsBalance = byPhoneNumber.getSmsBalance();
+        if (smsBalance < 0) {
+            throw new NoSmsBalance("not enough balance sms for phone number" + phoneNumber.getNumber());
+        }
+        byPhoneNumber.setSmsBalance(smsBalance - 1);
+        numberBalanceRepository.save(byPhoneNumber);
+    }
+
+    public SmsHistory saveMessage(SmsHistoryDTO smsToSend) throws NoSuchPhoneNumber, NoSmsBalance {
         PhoneNumber phoneNumber = findPhoneNumber(smsToSend.getPhoneNumberReceiver()).
                 orElseThrow(() -> new NoSuchPhoneNumber("No such phone number " + smsToSend.getPhoneNumberReceiver()));
 
@@ -47,7 +63,7 @@ public class MessageService {
 
         SmsHistory smsHistory = SmsHistoryConverter.toEntity(smsToSend, phoneNumber);
         smsHistory.setPhoneNumberSender(phoneNumberSender);
-
+        subSmsFromBalance(phoneNumberSender);
         return smsHistoryRepository.save(smsHistory);
     }
 
@@ -59,6 +75,31 @@ public class MessageService {
                 .sorted(Comparator.comparing(SmsHistory::getDateSms).reversed())
                 .filter(distinctByKey(SmsHistory::getPhoneNumberReceiver))
                 .map(SmsHistoryConverter::toDto).collect(Collectors.toList());
+    }
+
+    public List<SmsHistoryDTO> smsHistoryDTOList(String phoneNumberSenderString, String phoneNumberReceiverString) {
+
+        Optional<PhoneNumber> optionalPhoneNumberSender = phoneNumberRepository.findByNumber(phoneNumberSenderString);
+        Optional<PhoneNumber> optionalPhoneNumberReceiver = phoneNumberRepository.findByNumber(phoneNumberReceiverString);
+
+        if (optionalPhoneNumberSender.isPresent() && optionalPhoneNumberReceiver.isPresent()) {
+            PhoneNumber phoneNumberSender = optionalPhoneNumberSender.get();
+            PhoneNumber phoneNumberReceiver = optionalPhoneNumberReceiver.get();
+
+
+            List<SmsHistoryDTO> sender = smsHistoryRepository.findByPhoneNumberReceiverAndPhoneNumberSender(phoneNumberSender, phoneNumberReceiver).stream()
+                    .map(SmsHistoryConverter::toDto)
+                    .collect(Collectors.toList());
+
+            List<SmsHistoryDTO> receiver = smsHistoryRepository.findByPhoneNumberReceiverAndPhoneNumberSender(phoneNumberReceiver, phoneNumberSender).stream()
+                    .map(SmsHistoryConverter::toDto)
+                    .collect(Collectors.toList());
+
+
+            return Stream.concat(receiver.stream(), sender.stream()).collect(Collectors.toList());
+        }
+
+        return null;
     }
 
 
