@@ -23,8 +23,8 @@ public class BrowserController {
     public BrowserController(BrowserService browserService) {
         this.browserService = browserService;
     }
-    @GetMapping
-    public ResponseEntity<Double> getInternetBalance(String phoneNumber) {
+    @PostMapping
+    public ResponseEntity<Double> getInternetBalance(@RequestBody String phoneNumber) {
         return ResponseEntity.ok(browserService.takeInternet(phoneNumber));
     }
 
