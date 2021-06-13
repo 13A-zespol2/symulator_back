@@ -11,5 +11,5 @@ import psk.isi.simulator.model.database.entities.PhoneNumber;
 @NoArgsConstructor
 public class BrowserDto {
     private String phoneNumber;
-    private int time;
+    private Double time;
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import psk.isi.simulator.errors.NoSuchPhoneNumber;
 import psk.isi.simulator.model.database.repository.NumberBalanceRepository;
 import psk.isi.simulator.model.database.repository.PhoneNumberRepository;
 import psk.isi.simulator.model.transport.dto.BrowserDto;
@@ -29,9 +30,13 @@ public class BrowserController {
 
     @PostMapping(path = "/time")
     public ResponseEntity<?> getTimeOnBrowser(@RequestBody BrowserDto browserDto){
-        browserService.saveBrowsing(browserDto);
+        try {
+            browserService.saveBrowsing(browserDto);
+        } catch (NoSuchPhoneNumber noSuchPhoneNumber) {
+            return ResponseEntity.badRequest().build();
+        }
 
-        return null;
+        return ResponseEntity.ok().build();
     }
 }
 
