@@ -18,12 +18,14 @@ public class NumberBalance {
     private PhoneNumber phoneNumber;
     private Double balanceAccount;
     private Double balanceInternet;
+    private Double balanceMinutes;
     private int smsBalance;
 
-    public NumberBalance(PhoneNumber phoneNumber, Double balanceAccount, Double balanceInternet, int smsBalance) {
+    public NumberBalance(PhoneNumber phoneNumber, Double balanceAccount, Double balanceInternet, Double balanceMinutes ,int smsBalance) {
         this.phoneNumber = phoneNumber;
         this.balanceAccount = balanceAccount;
         this.balanceInternet = balanceInternet;
+        this.balanceMinutes = balanceMinutes;
         this.smsBalance = smsBalance;
     }
 }
