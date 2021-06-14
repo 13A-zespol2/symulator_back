@@ -68,24 +68,19 @@ public class MessageService {
 
     public List<SmsHistoryDTO> findLastSms(String phoneNumber) throws NoSuchPhoneNumber {
         PhoneNumber byNumber = phoneNumberRepository.findByNumber(phoneNumber).orElseThrow(() -> new NoSuchPhoneNumber("No such phone number " + phoneNumber));
-        List<SmsHistory> collect = smsHistoryRepository.findAllByNumberQuery(byNumber);
+        List<PhoneNumber> collect = smsHistoryRepository.findALlContactsSms(byNumber).stream().filter(distinctByKey(PhoneNumber::getIdPhoneNumber)).collect(Collectors.toList());
+        collect.remove(byNumber);
 
-        List<SmsHistory> collect1 = collect.stream()
-                .sorted(Comparator.comparing(SmsHistory::getDateSms).reversed())
-                .filter(distinctByKey(SmsHistory::getPhoneNumberReceiver))
-                .filter(distinctByKey(SmsHistory::getPhoneNumberSender))
-                .collect(Collectors.toList());
 
-        List<SmsHistoryDTO> smsHistoryDTOS = new ArrayList<>();
-        for (SmsHistory el : collect1) {
-            if (!el.getPhoneNumberSender().equals(byNumber)) {
-                PhoneNumber phoneNumberReceiver = el.getPhoneNumberReceiver();
-                el.setPhoneNumberReceiver(el.getPhoneNumberSender());
-                el.setPhoneNumberSender(phoneNumberReceiver);
-            }
-            smsHistoryDTOS.add(SmsHistoryConverter.toDto(el));
+        List<SmsHistory> smsHistoryDTOS = new ArrayList<>();
+        for (PhoneNumber phoneNumber1 : collect) {
+
+            SmsHistory aLlContactsSms = smsHistoryRepository.findALlContactsSms(phoneNumber1, byNumber);
+            smsHistoryDTOS.add(aLlContactsSms);
+
         }
-        return smsHistoryDTOS;
+
+        return smsHistoryDTOS.stream().map(SmsHistoryConverter::toDto).collect(Collectors.toList());
     }
 
     public List<SmsHistoryDTO> smsHistoryDTOList(String phoneNumberSenderString, String phoneNumberReceiverString) {

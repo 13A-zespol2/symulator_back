@@ -15,4 +15,13 @@ public interface SmsHistoryRepository extends JpaRepository<SmsHistory, Long> {
     List<SmsHistory> findAllByNumberQuery(PhoneNumber phoneNumber);
 
 
+    @Query(value = "SELECT sh.phoneNumberSender FROM SmsHistory sh WHERE sh.phoneNumberReceiver = ?1 OR sh.phoneNumberSender = ?1")
+    List<PhoneNumber> findALlContactsSms(PhoneNumber phoneNumber);
+
+
+
+    @Query(value = "SELECT * FROM sms_history se WHERE date_sms = (SELECT MAX(sh.date_sms) FROM sms_history sh WHERE sh.phone_number_receiver_id_phone_number = ?2 AND sh.phone_number_sender_id_phone_number = ?1  OR sh.phone_number_receiver_id_phone_number = ?1 AND sh.phone_number_sender_id_phone_number = ?2 ORDER BY sh.date_sms DESC)",nativeQuery = true)
+    SmsHistory findALlContactsSms(PhoneNumber phoneNumber,PhoneNumber phoneNumber2);
+
+
 }
