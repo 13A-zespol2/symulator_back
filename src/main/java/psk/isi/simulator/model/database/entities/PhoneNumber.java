@@ -13,6 +13,9 @@ import javax.persistence.Id;
 @Entity
 @AllArgsConstructor
 @Data
+/**
+ * Klasa odpowiadająca za tabelę ,,PhoneNumber" (przechowuje informacje na temat numerów klientów).
+ */
 public class PhoneNumber {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -13,6 +13,9 @@ import psk.isi.simulator.model.transport.dto.CallDto;
 import java.util.Optional;
 
 
+/**
+ * Klasa zarządzająca polaczeniami telefonicznymi.
+ */
 @Service
 public class CallingService {
 
@@ -25,10 +28,21 @@ public class CallingService {
         this.phoneNumberRepository = phoneNumberRepository;
     }
 
+    /**
+     * Metoda znajdujaca numer telefonu w bazie danych.
+     * @param phoneNumberString
+     * @return
+     */
     private Optional<PhoneNumber> findPhoneNumber(String phoneNumberString) {
         return phoneNumberRepository.findByNumber(phoneNumberString);
     }
 
+    /**
+     * Metoda odpowiedzialna za przeliczenie czasu spedzonego na polaczeniu na pakiet minut i aktualizowanie jego stanu.
+     * @param callDto
+     * @throws NoSuchPhoneNumber
+     * @throws NoMinutesBalance
+     */
     public void saveCalling(CallDto callDto) throws NoSuchPhoneNumber, NoMinutesBalance {
 
         PhoneNumber phoneNumber = findPhoneNumber(callDto.getPhoneNumber()).
@@ -45,6 +59,11 @@ public class CallingService {
         numberBalanceRepository.save(byPhoneNumber);
     }
 
+    /**
+     * Metoda sprawdzajaca stan pakietu minut dla danego numeru telefonu.
+     * @param phoneNumber
+     * @return
+     */
     public double takeMinutes(String phoneNumber) {
         Optional<PhoneNumber> byNumber = phoneNumberRepository.findByNumber(phoneNumber);
         if (byNumber.isEmpty()) {

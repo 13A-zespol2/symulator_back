@@ -17,7 +17,14 @@ import java.util.Collections;
 
 @EnableSwagger2
 @Configuration
+/**
+ * Klasa odpowiadająca za obsługę Swaggera
+ */
 public class SwaggerConfig {
+    /**
+     * Metoda ustawiająca konfigurację Swaggera.
+     * @return
+     */
     @Bean
     public Docket myAPI() {
         return new Docket(DocumentationType.SWAGGER_2)
@@ -31,6 +38,10 @@ public class SwaggerConfig {
                 .build();
     }
 
+    /**
+     * Metoda ustawiająca informacje dodatkowe o aplikacji.
+     * @return
+     */
     private ApiInfo apiInfo() {
         return new ApiInfo(
                 "Operator komomorkowy",

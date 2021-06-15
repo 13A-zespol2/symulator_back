@@ -10,6 +10,9 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Data
 @Entity
+/**
+ * Klasa odpowiadająca za tabelę ,,NumberBalance" (stan wykorzystania pakietów użytkownika).
+ */
 public class NumberBalance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

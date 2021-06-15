@@ -12,6 +12,9 @@ import java.util.Date;
 @AllArgsConstructor
 @Data
 @Entity
+/**
+ * Klasa zawierająca pola odpowiadające za historię połączeń użytkownika
+ */
 public class PhoneHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

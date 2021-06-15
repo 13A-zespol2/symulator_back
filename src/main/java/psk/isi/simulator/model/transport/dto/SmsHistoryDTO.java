@@ -9,6 +9,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
+/**
+ * Klasa transportowa dla historii SMS.
+ */
 @Getter
 @Setter
 public class SmsHistoryDTO {

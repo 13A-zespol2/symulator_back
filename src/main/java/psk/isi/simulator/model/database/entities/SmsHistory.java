@@ -11,6 +11,9 @@ import java.util.Date;
 @Entity
 @AllArgsConstructor
 @Data
+/**
+ * Klasa odpowiadająca za tabelę ,,SmsHistory" (przechowuje wszystkie wysłane SMS).
+ */
 public class SmsHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

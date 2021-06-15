@@ -13,6 +13,10 @@ import psk.isi.simulator.model.transport.dto.PhoneNumberDto;
 
 import java.util.Optional;
 
+
+/**
+ * Klasa kontrolera obsługująca endpointy dotyczące obslugi logowania.
+ */
 @RestController
 public class LoginPhoneController {
     private final PhoneNumberRepository phoneNumberRepository;
@@ -24,6 +28,11 @@ public class LoginPhoneController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Metoda odbierajaca obiekt PhoneNumberDto i sprawdzajaca czy dane logowania sa poprawne.
+     * @param phoneNumber
+     * @return
+     */
     @PostMapping(path = "/login")
     public ResponseEntity<PhoneNumberDto> loginPhoneNumber(@RequestBody PhoneNumberDto phoneNumber) {
         String number = phoneNumber.getNumber();

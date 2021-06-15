@@ -18,7 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
+/**
+ * Klasa zarządzająca serwisem SMS.
+ */
 @Service
 public class MessageService {
     private final SmsHistoryRepository smsHistoryRepository;
@@ -37,11 +39,20 @@ public class MessageService {
         Set<Object> seen = ConcurrentHashMap.newKeySet();
         return t -> seen.add(keyExtractor.apply(t));
     }
-
+    /**
+     * Metoda znajdujaca numer telefonu w bazie danych.
+     * @param phoneNumberString
+     * @return
+     */
     private Optional<PhoneNumber> findPhoneNumber(String phoneNumberString) {
         return phoneNumberRepository.findByNumber(phoneNumberString);
     }
 
+    /**
+     * Metoda odpowiedzialna za odejmowanie danych z pakietu SMS.
+     * @param phoneNumber
+     * @throws NoSmsBalance
+     */
     private void subSmsFromBalance(PhoneNumber phoneNumber) throws NoSmsBalance {
         NumberBalance byPhoneNumber = numberBalanceRepository.findByPhoneNumber(phoneNumber);
         int smsBalance = byPhoneNumber.getSmsBalance();
@@ -52,6 +63,13 @@ public class MessageService {
         numberBalanceRepository.save(byPhoneNumber);
     }
 
+    /**
+     * Metoda odpowiedzialna za zapisanie wyslanego SMS w bazie danych.
+     * @param smsToSend
+     * @return
+     * @throws NoSuchPhoneNumber
+     * @throws NoSmsBalance
+     */
     public SmsHistory saveMessage(SmsHistoryDTO smsToSend) throws NoSuchPhoneNumber, NoSmsBalance {
         PhoneNumber phoneNumber = findPhoneNumber(smsToSend.getPhoneNumberReceiver()).
                 orElseThrow(() -> new NoSuchPhoneNumber("No such phone number " + smsToSend.getPhoneNumberReceiver()));
@@ -67,6 +85,13 @@ public class MessageService {
         return smsHistoryRepository.save(smsHistory);
     }
 
+    /**
+     * Metoda odpowiedzialna za znajdowanie ostatniego odebranego lub wysłanego SMS.
+     * @param phoneNumber
+     * @return
+     * @throws NoSuchPhoneNumber
+     * @throws NoSmsBalance
+     */
     public List<SmsHistoryDTO> findLastSms(String phoneNumber) throws NoSuchPhoneNumber {
         PhoneNumber byNumber = phoneNumberRepository.findByNumber(phoneNumber).orElseThrow(() -> new NoSuchPhoneNumber("No such phone number " + phoneNumber));
         List<PhoneNumber> collect = smsHistoryRepository.findAllContactsSmsSender(byNumber);
@@ -89,6 +114,12 @@ public class MessageService {
         return smsHistoryDTOS.stream().map(SmsHistoryConverter::toDto).collect(Collectors.toList());
     }
 
+    /**
+     * Metoda zwracajaca historie wyslanych wiadomosci dla konwersacji dwoch użytkowników.
+     * @param phoneNumberSenderString
+     * @param phoneNumberReceiverString
+     * @return
+     */
     public List<SmsHistoryDTO> smsHistoryDTOList(String phoneNumberSenderString, String phoneNumberReceiverString) {
 
         Optional<PhoneNumber> optionalPhoneNumberSender = phoneNumberRepository.findByNumber(phoneNumberSenderString);
