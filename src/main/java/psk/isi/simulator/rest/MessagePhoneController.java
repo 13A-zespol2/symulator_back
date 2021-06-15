@@ -16,6 +16,9 @@ import psk.isi.simulator.service.MessageService;
 
 import java.util.List;
 
+/**
+ * Klasa kontrolera obsługująca endpointy dotyczące obslugi SMS
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/sms")
@@ -34,6 +37,11 @@ public class MessagePhoneController {
         this.smsHistoryRepository = smsHistoryRepository;
     }
 
+    /**
+     * Metoda odbierajaca obiekt SmsHistoryDTO i i przekazujaca go do metody zapisywania wiadomosci SMS.
+     * @param smsHistoryDTO
+     * @return
+     */
     @PostMapping(path = "/singlemessage")
     public ResponseEntity<SmsHistoryDTO> saveMessage(@RequestBody SmsHistoryDTO smsHistoryDTO) {
         SmsHistory smsHistory1;
@@ -46,6 +54,11 @@ public class MessagePhoneController {
         }
     }
 
+    /**
+     * Metoda odbierajaca obiekt z numerem telefonu i przekazujaca go do metody sprawdzajacej ostatni SMS dla numeru.
+     * @param phoneNumber
+     * @return
+     */
     @GetMapping(path = "/{phoneNumber}")
     public ResponseEntity<List<SmsHistoryDTO>> getLastNumber(@PathVariable String phoneNumber) {
         try {
@@ -56,6 +69,11 @@ public class MessagePhoneController {
         }
     }
 
+    /**
+     * Metoda odbierajaca obiekt DtoLoad i przekazujaca go do metody, ktora zwraca historie konwersacji dwóch użytkowników.
+     * @param receiver
+     * @return
+     */
     @PostMapping(path = "/load")
     public ResponseEntity<List<SmsHistoryDTO>> getAllNumbers(@RequestBody DtoLoad receiver) {
 

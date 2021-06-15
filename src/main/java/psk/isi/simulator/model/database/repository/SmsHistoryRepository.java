@@ -8,6 +8,9 @@ import psk.isi.simulator.model.database.entities.SmsHistory;
 import javax.persistence.OrderBy;
 import java.util.List;
 
+/**
+ * Interfejs odpowiadający za dostęp do tabeli ,,sms_history" w bazie danych.
+ */
 public interface SmsHistoryRepository extends JpaRepository<SmsHistory, Long> {
 
     List<SmsHistory> findAllByPhoneNumberSender(PhoneNumber phoneNumber);

@@ -11,7 +11,9 @@ import psk.isi.simulator.model.database.repository.PhoneNumberRepository;
 import psk.isi.simulator.model.transport.dto.BrowserDto;
 
 import java.util.Optional;
-
+/**
+ * Klasa zarządzająca przegladarka.
+ */
 @Service
 public class BrowserService {
 
@@ -28,6 +30,12 @@ public class BrowserService {
         return phoneNumberRepository.findByNumber(phoneNumberString);
     }
 
+    /**
+     * Metoda odpowiedzialna za przeliczenie czasu spedzonego na przegladarce na pakiet Internetu i aktualizowanie jego stanu.
+     * @param browserDto
+     * @throws NoSuchPhoneNumber
+     * @throws NoInternetBalance
+     */
     public void saveBrowsing(BrowserDto browserDto) throws NoSuchPhoneNumber, NoInternetBalance {
 
         PhoneNumber phoneNumber = findPhoneNumber(browserDto.getPhoneNumber()).
@@ -44,6 +52,11 @@ public class BrowserService {
         numberBalanceRepository.save(byPhoneNumber);
     }
 
+    /**
+     * Metoda sprawdzajaca stan pakietu Internet dla danego numeru telefonu.
+     * @param phoneNumber
+     * @return
+     */
     public double takeInternet(String phoneNumber) {
         Optional<PhoneNumber> byNumber = phoneNumberRepository.findByNumber(phoneNumber);
         if (byNumber.isEmpty()) {
